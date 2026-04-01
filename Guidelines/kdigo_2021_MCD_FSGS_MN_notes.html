@@ -1,0 +1,491 @@
+
+<style>
+:root { --tab-active: var(--color-text-primary); }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.outer { font-family: var(--font-sans); padding: 0; }
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--color-border-tertiary); margin-bottom: 0; }
+.tab-btn {
+  flex: 1; padding: 10px 4px; font-size: 13px; font-weight: 500;
+  background: none; border: none; border-bottom: 2.5px solid transparent;
+  color: var(--color-text-secondary); cursor: pointer; transition: all .18s;
+  letter-spacing: 0; text-align: center;
+}
+.tab-btn.active { color: var(--color-text-primary); border-bottom-color: var(--color-text-primary); }
+.tab-btn:hover:not(.active) { color: var(--color-text-primary); background: var(--color-background-secondary); }
+.panel { display: none; padding: 18px 0 0; }
+.panel.active { display: block; }
+
+/* Cards */
+.card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 14px 16px; margin-bottom: 12px; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .05em; }
+.section-head { font-size: 15px; font-weight: 500; color: var(--color-text-primary); margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+.badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+.badge-purple { background: #EEEDFE; color: #3C3489; }
+.badge-teal   { background: #E1F5EE; color: #0F6E56; }
+.badge-coral  { background: #FAECE7; color: #712B13; }
+.badge-amber  { background: #FAEEDA; color: #633806; }
+.badge-blue   { background: #E6F1FB; color: #0C447C; }
+.badge-red    { background: #FCEBEB; color: #791F1F; }
+@media (prefers-color-scheme: dark) {
+  .badge-purple { background: #26215C; color: #CECBF6; }
+  .badge-teal   { background: #04342C; color: #9FE1CB; }
+  .badge-coral  { background: #4A1B0C; color: #F0997B; }
+  .badge-amber  { background: #412402; color: #FAC775; }
+  .badge-blue   { background: #042C53; color: #B5D4F4; }
+  .badge-red    { background: #501313; color: #F7C1C1; }
+}
+.pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.desc { font-size: 13px; color: var(--color-text-secondary); line-height: 1.6; margin: 0; }
+.desc + .desc { margin-top: 4px; }
+.sep { border: none; border-top: 0.5px solid var(--color-border-tertiary); margin: 10px 0; }
+
+/* Treatment flow */
+.flow { display: flex; flex-direction: column; gap: 0; }
+.flow-step { position: relative; padding: 10px 14px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); margin-bottom: 0; background: var(--color-background-primary); }
+.flow-connector { width: 1px; height: 22px; background: var(--color-border-secondary); margin: 0 auto; display: flex; align-items: center; justify-content: center; position: relative; }
+.flow-connector::after { content: '↓'; position: absolute; font-size: 12px; color: var(--color-text-tertiary); top: 2px; }
+.step-label { font-size: 12px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 2px; }
+.step-content { font-size: 13px; color: var(--color-text-primary); margin: 0; }
+.step-sub { font-size: 12px; color: var(--color-text-secondary); margin: 3px 0 0; }
+
+/* Risk table */
+.rtable { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rtable th { text-align: left; padding: 6px 8px; color: var(--color-text-secondary); font-weight: 500; border-bottom: 1px solid var(--color-border-tertiary); }
+.rtable td { padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); color: var(--color-text-primary); vertical-align: top; }
+.rtable tr:last-child td { border-bottom: none; }
+
+/* Key points */
+.kp { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-start; }
+.kp-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+.kp-dot-purple { background: #7F77DD; }
+.kp-dot-teal   { background: #1D9E75; }
+.kp-dot-coral  { background: #D85A30; }
+.kp-dot-amber  { background: #BA7517; }
+.kp-dot-blue   { background: #378ADD; }
+.kp-dot-red    { background: #E24B4A; }
+.kp-text { font-size: 13px; color: var(--color-text-primary); line-height: 1.6; }
+.kp-text strong { font-weight: 500; }
+
+.highlight-box { background: var(--color-background-secondary); border-left: 3px solid; border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0; padding: 10px 14px; margin: 8px 0; }
+.hl-purple { border-color: #7F77DD; }
+.hl-teal   { border-color: #1D9E75; }
+.hl-coral  { border-color: #D85A30; }
+.hl-amber  { border-color: #BA7517; }
+.rec-label { font-size: 11px; font-weight: 500; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 2px; }
+.rec-text  { font-size: 13px; color: var(--color-text-primary); line-height: 1.5; margin: 0; }
+
+.two-col { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+@media (max-width: 500px) { .two-col { grid-template-columns: 1fr; } }
+
+.drug-row { display: flex; justify-content: space-between; align-items: baseline; padding: 5px 0; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.drug-row:last-child { border-bottom: none; }
+.drug-name { font-size: 13px; font-weight: 500; }
+.drug-note { font-size: 12px; color: var(--color-text-secondary); }
+
+.mini-badge { display: inline-block; font-size: 10px; font-weight: 500; padding: 1px 6px; border-radius: 10px; margin-left: 4px; }
+</style>
+
+<div class="outer">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="show('mn')">MN</button>
+    <button class="tab-btn" onclick="show('mcd')">MCD</button>
+    <button class="tab-btn" onclick="show('fsgs')">FSGS</button>
+    <button class="tab-btn" onclick="show('compare')">比較</button>
+  </div>
+
+  <!-- ═══════════════ MN PANEL ═══════════════ -->
+  <div id="panel-mn" class="panel active">
+
+    <div class="card">
+      <div class="section-head">Membranous Nephropathy (MN) <span class="badge badge-purple">Chapter 3</span></div>
+      <p class="desc">免疫複合體沉積於腎小球基底膜上皮下，導致腎病症候群。最常見於中老年男性。</p>
+      <div class="pill-row">
+        <span class="badge badge-purple">原發性 ≈ 80%</span>
+        <span class="badge badge-teal">抗體媒介</span>
+        <span class="badge badge-coral">次發性需排除</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔬 診斷重點</div>
+      <div class="kp">
+        <div class="kp-dot kp-dot-purple"></div>
+        <div class="kp-text"><strong>抗 PLA2R 抗體陽性 + 腎病症候群</strong>→ 可不需腎臟切片即診斷 MN（敏感性 78%、特異性 99%）</div>
+      </div>
+      <div class="kp">
+        <div class="kp-dot kp-dot-teal"></div>
+        <div class="kp-text"><strong>抗 PLA2R 陰性</strong>→ 仍需切片，並染色確認腎組織 PLA2R 抗原沉積</div>
+      </div>
+      <div class="kp">
+        <div class="kp-dot kp-dot-coral"></div>
+        <div class="kp-text">無論抗體狀態，<strong>所有 MN 患者均需評估次發性原因</strong>（惡性腫瘤、HBV/HCV/HIV、NSAIDs、自體免疫疾病）</div>
+      </div>
+      <div class="kp">
+        <div class="kp-dot kp-dot-amber"></div>
+        <div class="kp-text">次發性抗體：抗 <strong>THSD7A</strong> 抗體（較罕見，常與惡性腫瘤相關）</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 疾病進展風險分層</div>
+      <table class="rtable">
+        <tr>
+          <th>風險</th><th>蛋白尿</th><th>eGFR</th><th>白蛋白</th><th>抗PLA2R</th>
+        </tr>
+        <tr>
+          <td><span class="badge badge-teal">低</span></td>
+          <td>&lt;3.5 g/d</td>
+          <td>&gt;60</td>
+          <td>&gt;30 g/L</td>
+          <td>低效價</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-amber">中</span></td>
+          <td>3.5–8 g/d &gt;6個月</td>
+          <td>正常</td>
+          <td>25–30</td>
+          <td>中效價</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-coral">高</span></td>
+          <td>&gt;8 g/d &gt;6個月</td>
+          <td>60–30</td>
+          <td>&lt;25</td>
+          <td>高效價</td>
+        </tr>
+        <tr>
+          <td><span class="badge badge-red">極高</span></td>
+          <td>任何</td>
+          <td>&lt;30 或快速下降</td>
+          <td>&lt;20</td>
+          <td>持續高</td>
+        </tr>
+      </table>
+      <p class="desc" style="margin-top:8px;">⚠️ 抗 PLA2R 抗體消失<strong>早於</strong>蛋白尿緩解，應以免疫學緩解為療效指標。</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💊 治療策略</div>
+      <div class="highlight-box hl-purple">
+        <div class="rec-label">⚠️ 不需免疫抑制的條件</div>
+        <p class="rec-text">蛋白尿 &lt;3.5 g/d、白蛋白 &gt;30 g/L（BCP法）、eGFR &gt;60 → 保守治療即可</p>
+      </div>
+      <div class="highlight-box hl-teal">
+        <div class="rec-label">建議（1B）</div>
+        <p class="rec-text">有≥1項進展風險因子者：<strong>Rituximab</strong> 或 <strong>Cyclophosphamide + 隔月 GC × 6個月</strong> 或 <strong>CNI ≥6個月</strong></p>
+      </div>
+      <hr class="sep">
+      <p class="desc" style="margin-bottom:8px;font-weight:500;">各治療比較</p>
+      <div class="drug-row">
+        <span class="drug-name">Rituximab <span class="mini-badge badge-teal">優先</span></span>
+        <span class="drug-note">中等風險以上首選；副作用少</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">CNI（CsA / Tacrolimus）</span>
+        <span class="drug-note">中等風險可用；高復發率</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">Cyclophosphamide + GC</span>
+        <span class="drug-note">高/極高風險；累積劑量 ≤36g</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">MMF 單藥</span>
+        <span class="drug-note">不建議（無足夠緩解率）</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 免疫學監測（治療後6個月）</div>
+      <div class="flow">
+        <div class="flow-step" style="border-left:3px solid #1D9E75;">
+          <div class="step-label">免疫學緩解</div>
+          <div class="step-content">抗PLA2R &lt;2 RU/mL → 停止或不增加治療</div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step" style="border-left:3px solid #BA7517;">
+          <div class="step-label">部分反應</div>
+          <div class="step-content">效價下降但仍陽性 → 觀察或繼續治療</div>
+        </div>
+        <div class="flow-connector"></div>
+        <div class="flow-step" style="border-left:3px solid #D85A30;">
+          <div class="step-label">無反應 / 持續高效價</div>
+          <div class="step-content">更換治療方案；考慮再切片確認</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚠️ 特殊情境</div>
+      <div class="kp"><div class="kp-dot kp-dot-red"></div><div class="kp-text"><strong>血栓栓塞預防：</strong>白蛋白 &lt;25g/L（BCG法）者高風險，需評估抗凝治療（VTE vs. ATE 分別評估）</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-amber"></div><div class="kp-text"><strong>腎移植後復發：</strong>移植前抗PLA2R陽性→高復發風險；移植後定期監測抗體≥6–12個月</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text"><strong>抵抗性疾病：</strong>排除合併繼發性FSGS（白蛋白正常化但蛋白尿持續）；難治者轉介專門中心</div></div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ MCD PANEL ═══════════════ -->
+  <div id="panel-mcd" class="panel">
+
+    <div class="card">
+      <div class="section-head">Minimal Change Disease (MCD) <span class="badge badge-teal">Chapter 5（成人）</span></div>
+      <p class="desc">足細胞病變（podocytopathy），以 T 細胞失調為主要機轉，佔成人腎病症候群 10–25%。腎臟預後良好，但復發率高。</p>
+      <div class="pill-row">
+        <span class="badge badge-teal">類固醇敏感 &gt;80%</span>
+        <span class="badge badge-amber">復發率高</span>
+        <span class="badge badge-red">類固醇抵抗 10–20%</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔬 診斷要點</div>
+      <div class="kp"><div class="kp-dot kp-dot-teal"></div><div class="kp-text"><strong>成人 MCD 必須靠腎臟切片確診</strong>（無法從臨床資料單獨診斷）</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text">光學顯微鏡幾乎正常或輕微系膜增生；電子顯微鏡見廣泛<strong>足突消失</strong>，無電子緻密沉積</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-coral"></div><div class="kp-text">需排除次發性：Hodgkin's lymphoma、Lithium、NSAIDs</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-amber"></div><div class="kp-text">注意：切片量不足可能遺漏早期 FSGS 病灶</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🏥 初次治療 <span class="mini-badge badge-teal">建議（1C）</span></div>
+      <div class="highlight-box hl-teal">
+        <div class="rec-label">第一線</div>
+        <p class="rec-text">高劑量口服類固醇：<strong>Prednisone 1 mg/kg/d（最高80mg）</strong>，達完全緩解後2週開始減量，總療程約24週</p>
+      </div>
+      <div class="kp" style="margin-top:8px;"><div class="kp-dot kp-dot-amber"></div><div class="kp-text">最長使用<strong>16週</strong>；50%患者於4週緩解，另10–25%在16週內緩解</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-blue"></div><div class="kp-text">成人反應速度比兒童慢，需給予足夠時間</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text">類固醇禁忌時替代方案：<strong>Cyclophosphamide、CNI、MMF</strong></div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔄 定義（緩解 / 復發 / 抵抗 / 依賴）</div>
+      <div class="drug-row">
+        <span class="drug-name">完全緩解</span>
+        <span class="drug-note">PCR &lt;200 mg/g（&lt;0.2 g/d）</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">復發</span>
+        <span class="drug-note">緩解後 PCR ≥2000 mg/g（≥2 g/d）</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">頻繁復發（FR）</span>
+        <span class="drug-note">6個月內 ≥2次，或12個月內 ≥3次</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">類固醇依賴（SD）</span>
+        <span class="drug-note">減量或停藥14天內復發 × 2次</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">類固醇抵抗（SR）</span>
+        <span class="drug-note">高劑量 GC 16週仍未緩解</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💊 FR / SD MCD 治療選項 <span class="mini-badge badge-teal">建議（1C）</span></div>
+      <div class="kp"><div class="kp-dot kp-dot-teal"></div><div class="kp-text"><strong>Cyclophosphamide</strong> — 傳統首選第二線，緩解持久；注意不孕風險，單療程 &lt;12週</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text"><strong>Rituximab</strong> — 緩解率 65–100%，顯著減少復發次數；成本高但給藥方便（單療程）</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-blue"></div><div class="kp-text"><strong>CNI（CsA / Tac）</strong> — 緩解率 70–90%；但停藥後復發率高，需長期維持</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-amber"></div><div class="kp-text"><strong>MPAA（MMF / 麥考酚酸）</strong> — 緩解率 65–85%；適合 Cyclo + CNI 後仍復發者</div></div>
+      <div class="highlight-box hl-coral" style="margin-top:8px;">
+        <div class="rec-label">臨床決策考量</div>
+        <p class="rec-text">育齡期 → 避免 Cyclophosphamide；偏好單次給藥 → Rituximab；成本考量 → Cyclophosphamide；長期依賴 → CNI 但需監測腎毒性</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ FSGS PANEL ═══════════════ -->
+  <div id="panel-fsgs" class="panel">
+
+    <div class="card">
+      <div class="section-head">Focal Segmental Glomerulosclerosis (FSGS) <span class="badge badge-coral">Chapter 6</span></div>
+      <p class="desc">KDIGO 2021 對 FSGS 命名提出重大修訂，強調<strong>分類影響治療決策</strong>。</p>
+      <div class="pill-row">
+        <span class="badge badge-coral">原發性 FSGS</span>
+        <span class="badge badge-amber">繼發性 FSGS</span>
+        <span class="badge badge-blue">基因性 FSGS</span>
+        <span class="badge badge-purple">FSGS-UC（未定原因）</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 KDIGO 2021 分類定義</div>
+      <div class="drug-row">
+        <div>
+          <div class="drug-name">原發性 FSGS <span class="mini-badge badge-coral">需免疫治療</span></div>
+          <div class="drug-note">切片有 FSGS 病灶 + EM 廣泛足突消失 + 腎病症候群（蛋白尿&gt;3.5g/d + 低白蛋白）</div>
+        </div>
+      </div>
+      <div class="drug-row">
+        <div>
+          <div class="drug-name">繼發性 FSGS <span class="mini-badge badge-amber">不需免疫治療</span></div>
+          <div class="drug-note">已知病因（肥胖、HIV、APOL1、CNI、mTOR抑制劑、SARS-CoV-2等）</div>
+        </div>
+      </div>
+      <div class="drug-row">
+        <div>
+          <div class="drug-name">FSGS-UC <span class="mini-badge badge-purple">不需免疫治療</span></div>
+          <div class="drug-note">無腎病症候群、無廣泛足突消失、無可識別病因</div>
+        </div>
+      </div>
+      <div class="drug-row">
+        <div>
+          <div class="drug-name">基因性 FSGS <span class="mini-badge badge-blue">不需免疫治療</span></div>
+          <div class="drug-note">足細胞或基底膜蛋白基因突變（家族性 / 年輕 / 難治者優先檢測）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚡ 診斷與鑑別要點</div>
+      <div class="kp"><div class="kp-dot kp-dot-coral"></div><div class="kp-text"><strong>無腎病症候群的 FSGS</strong> → 先排除繼發性原因，勿直接給予免疫治療</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-blue"></div><div class="kp-text">EM 廣泛足突消失（difuse FPE）是<strong>原發性 FSGS</strong> 必要條件，但部分原發性患者 FPE 可低至 30%</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text">組織型（NOS / Tip / Cellular / Perihilar / Collapsing）鑑別價值有限，<strong>不能區分原發 vs 繼發</strong></div></div>
+      <div class="kp"><div class="kp-dot kp-dot-amber"></div><div class="kp-text"><strong>基因檢測適應症：</strong>年輕、家族史、染色體異常、對類固醇完全抵抗 → 建議轉介專門中心</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💊 原發性 FSGS 治療 <span class="mini-badge badge-coral">建議（1D）</span></div>
+      <div class="highlight-box hl-coral">
+        <div class="rec-label">第一線</div>
+        <p class="rec-text">高劑量口服類固醇：<strong>Prednisone 1 mg/kg/d（最高80mg）</strong>，達完全緩解為止（最長16週），緩解後維持類固醇≥6個月</p>
+      </div>
+      <div class="kp" style="margin-top:8px;"><div class="kp-dot kp-dot-amber"></div><div class="kp-text">類固醇相對禁忌 → 替代選擇：<strong>CNI（CsA 或 Tacrolimus）</strong></div></div>
+      <div class="highlight-box hl-amber" style="margin-top:8px;">
+        <div class="rec-label">建議（1C）— 類固醇抵抗性原發性 FSGS</div>
+        <p class="rec-text"><strong>Cyclosporine 或 Tacrolimus ≥6個月</strong>，有效者繼續維持≥12個月以降低復發</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔄 定義（FSGS）</div>
+      <div class="drug-row">
+        <span class="drug-name">完全緩解</span>
+        <span class="drug-note">PCR &lt;200 mg/g</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">部分緩解</span>
+        <span class="drug-note">蛋白尿下降≥50% 且 PCR 200–3500 mg/g</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">類固醇抵抗</span>
+        <span class="drug-note">高劑量 GC 16週後蛋白尿未達部分緩解</span>
+      </div>
+      <div class="drug-row">
+        <span class="drug-name">CNI抵抗/不耐受</span>
+        <span class="drug-note">→ 轉介專門中心，考慮再切片或臨床試驗</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚠️ 特殊情境</div>
+      <div class="kp"><div class="kp-dot kp-dot-blue"></div><div class="kp-text"><strong>腎移植後復發：</strong>原發性 FSGS 復發率高（32%，中位數1.5個月）；基因性 FSGS 移植後幾乎不復發</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-teal"></div><div class="kp-text"><strong>復發 FSGS（前次類固醇敏感）：</strong>治療方式同 FR/SD MCD</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-red"></div><div class="kp-text"><strong>基因性 FSGS：</strong>免疫治療抵抗為常見特徵，確認基因突變後應停止免疫治療，評估移植時機</div></div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════ COMPARE PANEL ═══════════════ -->
+  <div id="panel-compare" class="panel">
+
+    <div class="card">
+      <div class="card-title">⚡ 三病快速比較</div>
+      <table class="rtable">
+        <tr>
+          <th></th><th>MCD</th><th>FSGS（原發）</th><th>MN</th>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">切片必要性</td>
+          <td><span class="badge badge-red">必須</span></td>
+          <td><span class="badge badge-red">必須</span></td>
+          <td><span class="badge badge-teal">抗PLA2R+ 可免切</span></td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">自然緩解</td>
+          <td>少見（~30%）</td>
+          <td>罕見</td>
+          <td>常見（~40–45%）</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">類固醇反應</td>
+          <td>&gt;80% 緩解</td>
+          <td>~50% 緩解</td>
+          <td>效果有限</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">第一線治療</td>
+          <td>高劑量 GC（1C）</td>
+          <td>高劑量 GC（1D）</td>
+          <td>Rituximab / Cyclo + GC / CNI（1B）</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">監測生物標記</td>
+          <td>蛋白尿 / PCR</td>
+          <td>蛋白尿 / PCR</td>
+          <td>抗PLA2R抗體效價 + 蛋白尿</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">腎臟長期預後</td>
+          <td>極佳（類固醇敏感者）</td>
+          <td>中等（抵抗者差）</td>
+          <td>中等（40%進展）</td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">血栓栓塞風險</td>
+          <td>中</td>
+          <td>中</td>
+          <td><strong>高（尤其低白蛋白）</strong></td>
+        </tr>
+        <tr>
+          <td style="font-weight:500;">移植後復發</td>
+          <td>不常見</td>
+          <td>高（原發性）/ 低（基因性）</td>
+          <td>中等（抗PLA2R+ 則較高）</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧬 同為足細胞病：MCD vs 原發性 FSGS</div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text">兩者均有廣泛足突消失，可能代表同一疾病譜系</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-coral"></div><div class="kp-text">類固醇抵抗 MCD 再切片常見 FSGS 病灶 → 預後較差</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-teal"></div><div class="kp-text">FSGS 復發（前次類固醇敏感）治療策略同 FR/SD MCD</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-amber"></div><div class="kp-text">切片量不足可能將早期 FSGS 誤診為 MCD → 影響預後評估</div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="card">
+        <div class="card-title">🛡 GC 最長療程</div>
+        <div class="drug-row"><span class="drug-name">MCD</span><span class="drug-note">16 週</span></div>
+        <div class="drug-row"><span class="drug-name">FSGS</span><span class="drug-note">16 週</span></div>
+        <div class="drug-row"><span class="drug-name">MN</span><span class="drug-note">不作單藥一線</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🔑 CNI 使用時機</div>
+        <div class="drug-row"><span class="drug-name">MCD</span><span class="drug-note">GC禁忌 / FR-SD</span></div>
+        <div class="drug-row"><span class="drug-name">FSGS</span><span class="drug-note">GC抵抗後 ≥6個月</span></div>
+        <div class="drug-row"><span class="drug-name">MN</span><span class="drug-note">中等風險一線選項</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📌 臨床關鍵記憶點</div>
+      <div class="kp"><div class="kp-dot kp-dot-purple"></div><div class="kp-text"><strong>MN</strong>：抗 PLA2R 抗體是診斷與監測雙重工具；免疫學緩解（抗體轉陰）早於臨床緩解</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-teal"></div><div class="kp-text"><strong>MCD</strong>：腎預後極佳但高復發率；成人反應比兒童慢，給予足夠時間（最長16週）</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-coral"></div><div class="kp-text"><strong>FSGS</strong>：分類決定治療！<span style="color:var(--color-text-danger,#E24B4A)">繼發性/基因性/FSGS-UC 均不需免疫治療</span></div></div>
+      <div class="kp"><div class="kp-dot kp-dot-red"></div><div class="kp-text"><strong>Cyclophosphamide 累積劑量上限：</strong>一般 ≤36g；保留生育能力 ≤10g</div></div>
+      <div class="kp"><div class="kp-dot kp-dot-blue"></div><div class="kp-text"><strong>所有腎病症候群</strong>：均需最佳化支持治療（RAS 抑制劑、血壓控制、水腫管理）</div></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function show(tab) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-' + tab).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
